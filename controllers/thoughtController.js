@@ -1,5 +1,5 @@
 const { Thought, User } = require('../models');
-
+const { ObjectId } = require("mongoose").Types
 const thoughtController = {
   // get all thoughts
   async getThoughts(req, res) {
@@ -16,7 +16,7 @@ const thoughtController = {
  
   async getSingleThought(req, res) {
     try {
-      const ThoughtData = await Thought.findOne({ _id: req.params.thoughtId });
+      const ThoughtData = await Thought.findOne({ _id: new ObjectId(req.params.thoughtId) });
 console.log(ThoughtData)
       res.json(ThoughtData);
     } catch (err) {
@@ -43,7 +43,7 @@ console.log(ThoughtData)
   },
 
   async updateThought(req, res) {
-    const houghtData = await Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $set: req.body }, { runValidators: true, new: true });
+    const thoughtData = await Thought.findOneAndUpdate({ _id: new ObjectId(req.params.thoughtId) }, { $set: req.body }, { runValidators: true, new: true });
 
 
     res.json(thoughtData);
@@ -54,14 +54,14 @@ console.log(ThoughtData)
   // delete thought
   async deleteThought(req, res) {
     try {
-      const dbThoughtData = await Thought.findOneAndRemove({ _id: req.params.thoughtId })
+      const dbThoughtData = await Thought.findOneAndRemove({ _id: new ObjectId(req.params.thoughtId) })
 
     
 
       // remove thought from a user's thoughts array
       const dbUserData = User.findOneAndUpdate(
-        { thoughts: req.params.thoughtId },
-        { $pull: { thoughts: req.params.thoughtId } },
+        { thoughts: new ObjectId(req.params.thoughtId) },
+        { $pull: { thoughts: new ObjectId(req.params.thoughtId) } },
         { new: true }
       );
 
@@ -77,7 +77,7 @@ console.log(ThoughtData)
   async addReaction(req, res) {
     try {
       const dbThoughtData = await Thought.findOneAndUpdate(
-        { _id: req.params.thoughtId },
+        { _id: new ObjectId(req.params.thoughtId) },
         { $addToSet: { reactions: req.body } },
         { runValidators: true, new: true }
       );
@@ -93,8 +93,8 @@ console.log(ThoughtData)
   async removeReaction(req, res) {
     try {
       const dbThoughtData = await Thought.findOneAndUpdate(
-        { _id: req.params.thoughtId },
-        { $pull: { reactions: { reactionId: req.params.reactionId } } },
+        { _id: new ObjectId(req.params.thoughtId) },
+        { $pull: { reactions: { reactionId: new ObjectId (req.params.reactionId) } } },
         { runValidators: true, new: true }
       );
 
